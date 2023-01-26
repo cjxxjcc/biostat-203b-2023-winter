@@ -64,9 +64,13 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
 
 2. Display the contents in the folders `core`, `hosp`, `icu`. Why are these data files distributed as `.csv.gz` files instead of `.csv` (comma separated values) files? Read the page <https://mimic.mit.edu/docs/iv/> to understand what's in each folder.
 
-**core**: admissions.csv.gz	 patients.csv.gz  index.html  transfers.csv.gz
+**core**: ls ~/mimic/core
 
-**hosp**: d_hcpcs.csv.gz				      labevents.csv.gz
+admissions.csv.gz	 patients.csv.gz  index.html  transfers.csv.gz
+
+**hosp**:ls ~/mimic/hosp
+
+          d_hcpcs.csv.gz				      labevents.csv.gz
           d_icd_diagnoses.csv.gz			labevents_filtered_itemid.csv.gz
           d_icd_procedures.csv.gz			microbiologyevents.csv.gz
           d_labitems.csv.gz			      pharmacy.csv.gz
@@ -77,7 +81,9 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
           hcpcsevents.csv.gz			    services.csv.gz
           index.html
 
-**icu**: chartevents.csv.gz			            index.html
+**icu**: ls ~/mimic/icu
+
+         chartevents.csv.gz			            index.html
          chartevents_filtered_itemid.csv.gz	inputevents.csv.gz
          d_items.csv.gz			               	outputevents.csv.gz
          datetimeevents.csv.gz			        procedureevents.csv.gz
