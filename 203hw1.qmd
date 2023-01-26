@@ -58,9 +58,31 @@ ls -l ~/mimic
 ```
 Please, do **not** put these data files into Git; they are big. Do **not** copy them into your directory. Do **not** decompress the gz data files. These create unnecessary big files on storage and are not big data friendly practices. Just read from the data folder `~/mimic` directly in following exercises. 
 
+**Solution** : lrwxr-xr-x  1 chengjiaxin  staff  51 Jan 24 14:24 /Users/chengjiaxin/mimic -> /Users/chengjiaxin/Desktop/Biostat203b/mimic-iv-1.0
+
   Use Bash commands to answer following questions.
 
 2. Display the contents in the folders `core`, `hosp`, `icu`. Why are these data files distributed as `.csv.gz` files instead of `.csv` (comma separated values) files? Read the page <https://mimic.mit.edu/docs/iv/> to understand what's in each folder.
+
+**core**: admissions.csv.gz	 patients.csv.gz  index.html  transfers.csv.gz
+
+**hosp**: d_hcpcs.csv.gz				      labevents.csv.gz
+          d_icd_diagnoses.csv.gz			labevents_filtered_itemid.csv.gz
+          d_icd_procedures.csv.gz			microbiologyevents.csv.gz
+          d_labitems.csv.gz			      pharmacy.csv.gz
+          diagnoses_icd.csv.gz		    poe.csv.gz
+          drgcodes.csv.gz				      poe_detail.csv.gz
+          emar.csv.gz				          prescriptions.csv.gz
+          emar_detail.csv.gz		    	procedures_icd.csv.gz
+          hcpcsevents.csv.gz			    services.csv.gz
+          index.html
+
+**icu**: chartevents.csv.gz			            index.html
+         chartevents_filtered_itemid.csv.gz	inputevents.csv.gz
+         d_items.csv.gz			               	outputevents.csv.gz
+         datetimeevents.csv.gz			        procedureevents.csv.gz
+         icustays.csv.gz
+
 
 3. Briefly describe what bash commands `zcat`, `zless`, `zmore`, and `zgrep` do.
 
