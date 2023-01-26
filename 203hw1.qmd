@@ -299,7 +299,6 @@ echo {con,pre}{sent,fer}{s,ed}
 
 ```{bash}
 #| eval: true
-who am i
-## user name and current time 
+sleep time 5
+## suspends the calling process of the next command for a specified amount of time
 ```
-,
