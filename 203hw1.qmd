@@ -298,7 +298,7 @@ echo {con,pre}{sent,fer}{s,ed}
 ```
 
 ```{bash}
-#| eval: true
+#| eval: false
 sleep time 5
 ## suspends the calling process of the next command for a specified amount of time
 ```
