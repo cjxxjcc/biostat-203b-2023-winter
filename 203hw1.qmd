@@ -168,16 +168,19 @@ done
 1. You and your friend just have finished reading *Pride and Prejudice* by Jane Austen. Among the four main characters in the book, Elizabeth, Jane, Lydia, and Darcy, your friend thinks that Darcy was the most mentioned. You, however, are certain it was Elizabeth. Obtain the full text of the novel from <http://www.gutenberg.org/cache/epub/42671/pg42671.txt> and save to your local folder. 
 ```{bash}
 #| eval: false
-wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
+curl https://www.gutenberg.org/cache/epub/42671/pg42671.txt
 ```
 Explain what `wget -nc` does. Do **not** put this text file `pg42671.txt` in Git. Complete the following loop to tabulate the number of times each of the four characters is mentioned using Linux commands.
+
+ **Solution**: since "wget -nc" not work, Dr.zhou suggest me use " curl" to instead of "wget -nc". And I think "curl" and "wget" have same function. They both can enables data exchange between a device and a server through a terminal. By google, "-nc" mean if the file exist, not retrieved the file again.
+ 
 ```{bash}
 #| eval: false
-wget -nc http://www.gutenberg.org/cache/epub/42671/pg42671.txt
+curl https://www.gutenberg.org/cache/epub/42671/pg42671.txt
 for char in Elizabeth Jane Lydia Darcy
 do
   echo $char:
-  # some bash commands here
+  cat pg42671.txt|grep $char|wc -l
 done
 ```
 
@@ -204,9 +207,18 @@ head -n "$2" "$1" | tail -n "$3"
 Using `chmod` to make the file executable by the owner, and run
 ```{bash}
 #| eval: false
+chome 777 ./middle.sh
 ./middle.sh pg42671.txt 20 5
 ```
 Explain the output. Explain the meaning of `"$1"`, `"$2"`, and `"$3"` in this shell script. Why do we need the first line of the shell script?
+
+**Solution**: output is 5 lines of ./middle.sh 
+
+$1=pg42671.txt, $2=20, $3=5
+
+decide use which shell to execute
+
+
 
 ## Q5. More fun with Linux
 
