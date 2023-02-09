@@ -32,6 +32,8 @@ library(data.table)
 library(lubridate)
 library(R.utils)
 library(tidyverse)
+library(dplyr)
+library(ggplot2)
 ```
 
 MIMIC data location
@@ -63,7 +65,7 @@ system.time(time1 <- read.csv(paste0(mimic_path,"/core/admissions.csv.gz")))
 ```
 ```{r}
 #| eval: true
-system.time(time2 <- read_csv(paste0(mimic_path, "/core/admissions.csv.gz")))
+system.time(time2 <- read_csv(paste0(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE))
 ```
 
 ```{r}
@@ -86,12 +88,39 @@ system(
 )
 ```
 
-1. Import `icustatys.csv.gz` as a tibble `icustays_tble`. 
+1. Import `icustays.csv.gz` as a tibble `icustays_tble`. 
+```{r}
+icustays_tble <- read_csv(file.path(mimic_path, "/icu/icustays.csv.gz"),show_col_types = FALSE)
+print(icustays_tble, width=Inf)
+```
+**Solution**: I use read_csv to import "icustays.csv.gz" as a tibble "icustays_tble".
 
 2. How many unique `subject_id`? Can a `subject_id` have multiple ICU stays? 
-3. Summarize the number of ICU stays per `subject_id` by graphs. 
+```{r}
+#| eval: true
+unique_subjects <- n_distinct(icustays_tble$subject_id)
+unique_subjects
+```
+**Solution**: There are total 51350 uniqye 'subject_id'. and for one subject_id, it can have multiple ICU stays.
+
+3. Summarize the number of ICU stays per `subject_id` by graphs.
+```{r}
+stays_per_subject <- icustays_tble %>%
+  group_by(subject_id) %>%
+  summarize(n = n())
+ggplot(stays_per_subject, aes(x = n)) +
+  geom_histogram(binwidth = 1) +
+  xlab("Number of ICU Stays") +
+  ylab("Count")
+```
+**solution**: I use Histogram.
 
 4. For each `subject_id`, let's only keep the first ICU stay in the tibble `icustays_tble`. (Hint: `slice_min` and `slice_max` may take long. Think alternative ways to achieve the same function.)
+```{r}
+first_icu_stay <- icustays_tble %>%
+  group_by(subject_id) %>%
+  slice_head(n=1)
+```
 
 ## Q3. `admission` data
 
@@ -108,6 +137,10 @@ system(
 ```
 
 1. Import `admissions.csv.gz` as a tibble `admissions_tble`.
+```{r}
+admissions_tble <- read_csv(file.path(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE)
+print(admissions_tble,width = Inf)
+```
 
 2. Let's only keep the admissions that have a match in `icustays_tble` according to `subject_id` and `hadmi_id`.
 
