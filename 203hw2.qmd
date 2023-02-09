@@ -61,11 +61,11 @@ For later questions, we stick to the `read_csv` in tidyverse.
 
 ```{r}
 #| eval: true
-system.time(time1 <- read.csv(paste0(mimic_path,"/core/admissions.csv.gz")))
+system.time(time1 <- read.csv(str_c(mimic_path,"/core/admissions.csv.gz")))
 ```
 ```{r}
 #| eval: true
-system.time(time2 <- read_csv(paste0(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE))
+system.time(time2 <- read_csv(str_c(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE))
 ```
 
 ```{r}
@@ -90,7 +90,7 @@ system(
 
 1. Import `icustays.csv.gz` as a tibble `icustays_tble`. 
 ```{r}
-icustays_tble <- read_csv(file.path(mimic_path, "/icu/icustays.csv.gz"),show_col_types = FALSE)
+icustays_tble <- read_csv(str_c(mimic_path, "/icu/icustays.csv.gz"),show_col_types = FALSE)
 print(icustays_tble, width=Inf)
 ```
 **Solution**: I use read_csv to import "icustays.csv.gz" as a tibble "icustays_tble".
@@ -101,7 +101,7 @@ print(icustays_tble, width=Inf)
 unique_subjects <- n_distinct(icustays_tble$subject_id)
 unique_subjects
 ```
-**Solution**: There are total 51350 uniqye 'subject_id'. and for one subject_id, it can have multiple ICU stays.
+**Solution**: There are total 51350 unique 'subject_id'. and for one subject_id, it can have multiple ICU stays.
 
 3. Summarize the number of ICU stays per `subject_id` by graphs.
 ```{r}
@@ -117,9 +117,11 @@ ggplot(stays_per_subject, aes(x = n)) +
 
 4. For each `subject_id`, let's only keep the first ICU stay in the tibble `icustays_tble`. (Hint: `slice_min` and `slice_max` may take long. Think alternative ways to achieve the same function.)
 ```{r}
+#| eval: true
 first_icu_stay <- icustays_tble %>%
   group_by(subject_id) %>%
-  slice_head(n=1)
+  slice_head(n=1)%>%
+  print(width = Inf)
 ```
 
 ## Q3. `admission` data
