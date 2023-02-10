@@ -427,10 +427,115 @@ system(
 1. We are interested in the vitals for ICU patients: heart rate (220045), mean non-invasive blood pressure (220181), systolic non-invasive blood pressure (220179), body temperature in Fahrenheit (223761), and respiratory rate (220210). Retrieve a subset of `chartevents.csv.gz` only containing these items for the patients in `icustays_tble` as a tibble `chartevents_tble`.
 
     Hint: `chartevents.csv.gz` is a data file too big to be read in by the `read_csv` function in its default setting. Utilize the `col_select` option in the `read_csv` function to reduce the memory burden. It took my computer >15 minutes to ingest this file. If your computer really has trouble importing `labevents.csv.gz`, you can import from the reduced data file `chartevents_filtered_itemid.csv.gz`.
+```{r}
+d_items_tble <- read_csv(str_c(mimic_path,
+"/icu/d_items.csv.gz"), show_col_types = FALSE) %>%
+  filter(itemid %in% c(
+    220045,
+    220181,
+    220179,
+    223761,
+    220210
+    )) %>%
+  print(width = Inf)
+```
+
+```{r}
+system.time(
+  chartevents_tble <-
+    read_csv(str_c(mimic_path,
+"/icu/chartevents_filtered_itemid.csv.gz"),
+              col_select = c(subject_id, itemid, charttime,
+hadm_id, valuenum),
+              col_types = cols_only(subject_id = col_double(),
+                                    itemid = col_double(),
+                                    hadm_id = col_double(),
+                                    charttime = col_datetime(),
+                                    valuenum = col_double())
+              )%>%
+    semi_join(icustays_tble, by = c("subject_id")) %>%
+    filter(itemid %in% d_items_tble$itemid) %>%
+    print(width = Inf)
+)
+```
+**Solution**: I answer this base on the solution of Q5 that provide by Dr.Zhou
 
 2. Further restrict `chartevents_tble` to the first vital measurement during the ICU stay. 
+```{r}
+chartevents_tble <- chartevents_tble %>%
+  left_join(select(icustays_tble, subject_id, intime, outtime),
+by = c("subject_id"))%>%
+  filter(charttime >= intime & charttime <= outtime) %>%
+  group_by(subject_id, itemid) %>%
+  arrange(charttime, .by_group = TRUE) %>%
+  slice_head(n = 1) %>%
+  ungroup() %>%
+  select(-intime, -outtime, -charttime) %>%
+  pivot_wider(names_from = itemid, values_from = valuenum) %>%
+  rename_at(
+    vars(as.character(d_items_tble$itemid)),
+    ~str_to_lower(d_items_tble$label)
+  ) %>%
+  print(width = Inf)
+```
+**Solution**: I answer this base on the solution of Q5 that provide by Dr.Zhou
 
-3. Summarize these vital measurements by appropriate numerics and graphics. 
+3. Summarize these vital measurements by appropriate numerics and graphics.
+```{r}
+summary(chartevents_tble)
+```
+```{r}
+chartevents_tble %>%
+  select(3) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 1000) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+chartevents_tble %>%
+  select(4) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 1000) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 5) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+chartevents_tble %>%
+  select(5) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 1000) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 5) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+chartevents_tble %>%
+  select(6) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 200) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+chartevents_tble %>%
+  select(7) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 120) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
 
 ## Q7. Putting things together
 
