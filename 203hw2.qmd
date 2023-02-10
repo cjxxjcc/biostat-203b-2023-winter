@@ -212,7 +212,7 @@ ggplot(admissions_tble, aes(x = as.factor(minute(admittime)))) +
 admissions_tble <- admissions_tble %>%
   mutate(Length_of_stays = as.numeric(difftime(dischtime, admittime, units = "hours")))
 ggplot(admissions_tble, aes(x = Length_of_stays)) + 
-  geom_histogram(binwidth = 5) + 
+  geom_histogram(binwidth = 100) + 
   labs(x = "Length of hospital stay (hours)", y = "Count") + 
   ggtitle("Length of hospital stay Distribution")
 ```
@@ -242,6 +242,18 @@ patients_tble <- patients_tble %>%
 ```
 
 2. Summarize variables `gender` and `anchor_age`, and explain any patterns you see.
+```{r}
+ggplot(patients_tble, aes(x = gender, fill = gender)) +
+  geom_bar() +
+  labs(x = "Gender", y = "Count") +
+  ggtitle("Gender Distribution") +
+  scale_fill_manual(values = c("F"="pink", "M"="blue"))
+ggplot(patients_tble, aes(x = anchor_age, fill = gender)) + 
+  geom_histogram(binwidth = 1) + 
+  labs(x = "Anchor age", y = "Count") + 
+  ggtitle("Anchor age distribution by gender") +
+  scale_fill_manual(values = c("F" = "pink", "M" = "blue"))
+```
 
 ## Q5. Lab results
 
