@@ -554,20 +554,30 @@ mimic_icu_cohort <- icustays_tble %>%
     left_join(patients_tble, by = c("subject_id")) %>%
     left_join(labevents_tble, by = c("subject_id")) %>%
     left_join(chartevents_tble, by = c("subject_id")) %>%
-    mutate(age = anchor_age + year(admittime) - anchor_year) %>%
-    filter(age > 18) %>%
+    mutate(age_at_admission = anchor_age + year(admittime) - anchor_year) %>%
+    filter(age_at_admission > 18) %>%
     mutate(thirty_day_mort = 
-             ifelse(is.na(deathtime), "FALSE", 
-                    ifelse(as.Date(deathtime) - as.Date(admittime) <= 30, 
-                           "TRUE", "FALSE"))) %>%
+         ifelse(is.na(deathtime), "FALSE", 
+                ifelse(difftime(deathtime, admittime, units = "days") <= 30, 
+                       "TRUE", "FALSE"))) %>%
     print(width = 10)
 ```
+**Solution**: Vector memory exhausted, So I can only write the code, but cant run the result.
 
 ## Q8. Exploratory data analysis (EDA)
 
 Summarize following information using appropriate numerics or graphs.
 
 - `thirty_day_mort` vs demographic variables (ethnicity, language, insurance, marital_status, gender, age at hospital admission)
+```{r}
+mimic_icu_cohort %>%
+  ggplot(aes(x = factor(ethnicity), fill = thirty_day_mort)) +
+    geom_bar(position = "fill") +
+    scale_fill_manual(values = c("blue", "yellow")) +
+    labs(x = "Ethnicity", y = "Proportion", fill = "Thirty Day Mortality") +
+    theme(legend.position = "bottom") +
+    facet_wrap(~thirty_day_mort, scales = "free_y")
+```
 
 - `thirty_day_mort` vs first lab measurements
 
