@@ -554,7 +554,13 @@ mimic_icu_cohort <- icustays_tble %>%
     left_join(patients_tble, by = c("subject_id")) %>%
     left_join(labevents_tble, by = c("subject_id")) %>%
     left_join(chartevents_tble, by = c("subject_id")) %>%
-
+    mutate(age = anchor_age + year(admittime) - anchor_year) %>%
+    filter(age > 18) %>%
+    mutate(thirty_day_mort = 
+             ifelse(is.na(deathtime), "FALSE", 
+                    ifelse(as.Date(deathtime) - as.Date(admittime) <= 30, 
+                           "TRUE", "FALSE"))) %>%
+    print(width = 10)
 ```
 
 ## Q8. Exploratory data analysis (EDA)
