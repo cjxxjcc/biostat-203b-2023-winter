@@ -335,7 +335,7 @@ valuenum),
 
 3. Further restrict `labevents_tble` to the first lab measurement during the ICU stay. 
 ```{r}
-labevents_tble <- labevents_tble %>%
+labevents_tble1 <- labevents_tble %>%
   left_join(select(icustays_tble, subject_id, intime, outtime),
 by = c("subject_id"))%>%
   filter(charttime >= intime & charttime <= outtime) %>%
@@ -355,11 +355,11 @@ by = c("subject_id"))%>%
 
 4. Summarize the lab measurements by appropriate numerics and graphics. 
 ```{r}
-summary(labevents_tble[-1])
+summary(labevents_tble1)
 ```
 
 ```{r}
-labevents_tble %>%
+labevents_tble1 %>%
   select(2,3,7,8) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 200) %>%
@@ -369,7 +369,7 @@ labevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-labevents_tble %>%
+labevents_tble1 %>%
   select(4,6) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 40) %>%
@@ -379,7 +379,7 @@ labevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-labevents_tble %>%
+labevents_tble1 %>%
   select(5) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 2500) %>%
@@ -389,7 +389,7 @@ labevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-labevents_tble %>%
+labevents_tble1 %>%
   select(9) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 600) %>%
@@ -462,7 +462,7 @@ hadm_id, valuenum),
 
 2. Further restrict `chartevents_tble` to the first vital measurement during the ICU stay. 
 ```{r}
-chartevents_tble <- chartevents_tble %>%
+chartevents_tble1 <- chartevents_tble %>%
   left_join(select(icustays_tble, subject_id, intime, outtime),
 by = c("subject_id"))%>%
   filter(charttime >= intime & charttime <= outtime) %>%
@@ -482,10 +482,10 @@ by = c("subject_id"))%>%
 
 3. Summarize these vital measurements by appropriate numerics and graphics.
 ```{r}
-summary(chartevents_tble)
+summary(chartevents_tble1)
 ```
 ```{r}
-chartevents_tble %>%
+chartevents_tble1 %>%
   select(3) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 1000) %>%
@@ -495,7 +495,7 @@ chartevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-chartevents_tble %>%
+chartevents_tble1 %>%
   select(4) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 1000) %>%
@@ -505,7 +505,7 @@ chartevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-chartevents_tble %>%
+chartevents_tble1 %>%
   select(5) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 1000) %>%
@@ -515,7 +515,7 @@ chartevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-chartevents_tble %>%
+chartevents_tble1 %>%
   select(6) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 200) %>%
@@ -525,7 +525,7 @@ chartevents_tble %>%
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-chartevents_tble %>%
+chartevents_tble1 %>%
   select(7) %>%
   gather(key, value) %>%
   filter(is.finite(value) & value >= 0 & value <= 120) %>%
@@ -547,6 +547,15 @@ Let us create a tibble `mimic_icu_cohort` for all ICU stays, where rows are the 
 - first lab measurements during ICU stay  
 - first vital measurements during ICU stay
 - an indicator variable `thirty_day_mort` whether the patient died within 30 days of hospital admission (30 day mortality)
+
+```{r}
+mimic_icu_cohort <- icustays_tble %>%
+    left_join(admissions_tble, by = c("subject_id", "hadm_id")) %>%
+    left_join(patients_tble, by = c("subject_id")) %>%
+    left_join(labevents_tble, by = c("subject_id")) %>%
+    left_join(chartevents_tble, by = c("subject_id")) %>%
+
+```
 
 ## Q8. Exploratory data analysis (EDA)
 
