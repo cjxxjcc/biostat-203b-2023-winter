@@ -335,17 +335,71 @@ valuenum),
 
 3. Further restrict `labevents_tble` to the first lab measurement during the ICU stay. 
 ```{r}
-labevents_tble %>%
+labevents_tble <- labevents_tble %>%
   left_join(select(icustays_tble, subject_id, intime, outtime),
 by = c("subject_id"))%>%
   filter(charttime >= intime & charttime <= outtime) %>%
   group_by(subject_id, itemid) %>%
   arrange(charttime, .by_group = TRUE) %>%
   slice_head(n = 1) %>%
+  ungroup() %>%
+  select(-intime, -outtime, -charttime) %>%
+  pivot_wider(names_from = itemid, values_from = valuenum) %>%
+  rename_at(
+    vars(as.character(dlabitems_tble$itemid)),
+    ~str_to_lower(dlabitems_tble$label)
+  ) %>%
   print(width = Inf)
 ```
+**Solution**: Dr.Zhou provide solution of this question.
 
 4. Summarize the lab measurements by appropriate numerics and graphics. 
+```{r}
+summary(labevents_tble[-1])
+```
+
+```{r}
+labevents_tble %>%
+  select(2,3,7,8) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 200) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+labevents_tble %>%
+  select(4,6) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 40) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+labevents_tble %>%
+  select(5) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 2500) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+labevents_tble %>%
+  select(9) %>%
+  gather(key, value) %>%
+  filter(is.finite(value) & value >= 0 & value <= 600) %>%
+  ggplot(aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~key, scales = "free_y") +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
 
 ## Q6. Vitals from charted events
 
