@@ -63,6 +63,7 @@ For later questions, we stick to the `read_csv` in tidyverse.
 #| eval: true
 system.time(time1 <- read.csv(str_c(mimic_path,"/core/admissions.csv.gz")))
 ```
+
 ```{r}
 #| eval: true
 system.time(time2 <- read_csv(str_c(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE))
@@ -237,6 +238,7 @@ system(
 ```{r}
 patients_tble <- read_csv(str_c(mimic_path, "/core/patients.csv.gz"),show_col_types = FALSE)
 patients_tble <- patients_tble %>%
+  arrange(subject_id) %>%
   semi_join(icustays_tble, by = "subject_id")%>%
   print(width=Inf)
 ```
@@ -281,12 +283,67 @@ system(
 ```
 
 1. Find how many rows are in `labevents.csv.gz`.
+```{r}
+system(
+  str_c(
+    "zcat < ", 
+    str_c(mimic_path, "/hosp/labevents.csv.gz"), 
+    " | tail -n +2 | wc -l"
+    ), 
+  intern = TRUE
+)
+```
+**Solution**: there are total 122103667 row in labevents.csv.gz
 
 2. We are interested in the lab measurements of creatinine (50912), potassium (50971), sodium (50983), chloride (50902), bicarbonate (50882), hematocrit (51221), white blood cell count (51301), and glucose (50931). Retrieve a subset of `labevents.csv.gz` only containing these items for the patients in `icustays_tble` as a tibble `labevents_tble`. 
 
     Hint: `labevents.csv.gz` is a data file too big to be read in by the `read_csv` function in its default setting. Utilize the `col_select` option in the `read_csv` function to reduce the memory burden. It took my computer 5-10 minutes to ingest this file. If your computer really has trouble importing `labevents.csv.gz`, you can import from the reduced data file `labevents_filtered_itemid.csv.gz`.
+```{r}
+dlabitems_tble <- read_csv(str_c(mimic_path,
+"/hosp/d_labitems.csv.gz"), show_col_types = FALSE) %>%
+  filter(itemid %in% c(
+    50912,
+    50971,
+    50983,
+    50902,
+    50882,
+    51221,
+    51301,
+    50931
+    )) %>%
+  print(width = Inf)
+```
+
+```{r}
+system.time(
+  labevents_tble <-
+    read_csv(str_c(mimic_path,
+"/hosp/labevents_filtered_itemid.csv.gz"),
+              col_select = c(subject_id, itemid, charttime,
+valuenum),
+              col_types = cols_only(subject_id = col_double(),
+                                    itemid = col_double(),
+                                    charttime = col_datetime(),
+                                    valuenum = col_double())
+              )%>%
+    semi_join(icustays_tble, by = c("subject_id")) %>%
+    filter(itemid %in% dlabitems_tble$itemid) %>%
+    print(width = Inf)
+)
+```
+**Solution**: Dr.Zhou provide the solution of this question.
 
 3. Further restrict `labevents_tble` to the first lab measurement during the ICU stay. 
+```{r}
+labevents_tble %>%
+  left_join(select(icustays_tble, subject_id, intime, outtime),
+by = c("subject_id"))%>%
+  filter(charttime >= intime & charttime <= outtime) %>%
+  group_by(subject_id, itemid) %>%
+  arrange(charttime, .by_group = TRUE) %>%
+  slice_head(n = 1) %>%
+  print(width = Inf)
+```
 
 4. Summarize the lab measurements by appropriate numerics and graphics. 
 
