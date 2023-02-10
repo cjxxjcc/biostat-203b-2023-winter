@@ -118,8 +118,9 @@ ggplot(stays_per_subject, aes(x = n)) +
 4. For each `subject_id`, let's only keep the first ICU stay in the tibble `icustays_tble`. (Hint: `slice_min` and `slice_max` may take long. Think alternative ways to achieve the same function.)
 ```{r}
 #| eval: true
-first_icu_stay <- icustays_tble %>%
+icustays_tble <- icustays_tble %>%
   group_by(subject_id) %>%
+  arrange(intime, .by_group = FALSE)%>%
   slice_head(n=1)%>%
   print(width = Inf)
 ```
@@ -140,22 +141,84 @@ system(
 
 1. Import `admissions.csv.gz` as a tibble `admissions_tble`.
 ```{r}
-admissions_tble <- read_csv(file.path(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE)
+admissions_tble <- read_csv(str_c(mimic_path, "/core/admissions.csv.gz"),show_col_types = FALSE)
 print(admissions_tble,width = Inf)
 ```
+**Solution**:I use read_csv to import `admissions.csv.gz` as a tibble `admissions_tble`.
 
 2. Let's only keep the admissions that have a match in `icustays_tble` according to `subject_id` and `hadmi_id`.
+```{r}
+admissions_tble <- admissions_tble %>%
+  semi_join(icustays_tble, by = c("subject_id", "hadm_id")) %>%
+  print(width = Inf)
+```
+**solution**: this result provide a 53150 * 15 tibble
+
 
 3. Summarize the following variables by graphics. 
 
-    - admission year  
+    - admission year 
+```{r}
+ggplot(admissions_tble, aes(x = as.factor(year(admittime)))) + 
+  geom_bar(fill = "blue") + 
+  labs(x = "Admission Year", y = "Count") + 
+  ggtitle("Admission Year Distribution")
+```
+  
     - admission month  
+```{r}
+ggplot(admissions_tble, aes(x = as.factor(month(admittime)))) + 
+  geom_bar(fill = "blue") + 
+  labs(x = "Admission month", y = "Count") + 
+  ggtitle("Admission month Distribution")
+```    
+
     - admission month day  
+```{r}
+ggplot(admissions_tble, aes(x = as.factor(mday(admittime)))) + 
+  geom_bar(fill = "blue") + 
+  labs(x = "Admission month day", y = "Count") + 
+  ggtitle("Admission month day Distribution")
+```    
+
     - admission week day  
-    - admission hour (anything unusual?)  
-    - admission minute (anything unusual?)  
-    - length of hospital stay (anything unusual?)    
+```{r}
+ggplot(admissions_tble, aes(x = as.factor(wday(admittime)))) + 
+  geom_bar(fill = "blue") + 
+  labs(x = "Admission week day", y = "Count") + 
+  ggtitle("Admission weak day Distribution")
+```    
     
+    - admission hour (anything unusual?)
+```{r}
+ggplot(admissions_tble, aes(x = as.factor(hour(admittime)))) + 
+  geom_bar(fill = "blue") + 
+  labs(x = "Admission hour", y = "Count") + 
+  ggtitle("Admission hour Distribution")
+```
+**Solution**: 0 and 7 is very high in period from 12am to 12pm.
+
+    - admission minute (anything unusual?)
+```{r}
+ggplot(admissions_tble, aes(x = as.factor(minute(admittime)))) + 
+  geom_bar(fill = "blue") + 
+  labs(x = "Admission minute", y = "Count") + 
+  ggtitle("Admission minute Distribution")
+```    
+**Solution**: 0, 15, 30 and 45 is very high.    
+    
+    - length of hospital stay (anything unusual?)   
+```{r}
+admissions_tble <- admissions_tble %>%
+  mutate(Length_of_stays = as.numeric(difftime(dischtime, admittime, units = "hours")))
+ggplot(admissions_tble, aes(x = Length_of_stays)) + 
+  geom_histogram(binwidth = 5) + 
+  labs(x = "Length of hospital stay (hours)", y = "Count") + 
+  ggtitle("Length of hospital stay Distribution")
+```
+**Solution**: Almost all of the data is concentrated on the far left side.
+
+
 ## Q4. `patients` data
 
 Patient information is available in `patients.csv.gz`. See <https://mimic.mit.edu/docs/iv/modules/core/patients/> for details of each field in this file. The first 10 lines are
@@ -171,6 +234,12 @@ system(
 ```
 
 1. Import `patients.csv.gz` (<https://mimic.mit.edu/docs/iv/modules/core/patients/>) as a tibble `patients_tble` and only keep the patients who have a match in `icustays_tble` (according to `subject_id`).
+```{r}
+patients_tble <- read_csv(str_c(mimic_path, "/core/patients.csv.gz"),show_col_types = FALSE)
+patients_tble <- patients_tble %>%
+  semi_join(icustays_tble, by = "subject_id")%>%
+  print(width=Inf)
+```
 
 2. Summarize variables `gender` and `anchor_age`, and explain any patterns you see.
 
