@@ -570,17 +570,40 @@ Summarize following information using appropriate numerics or graphs.
 
 - `thirty_day_mort` vs demographic variables (ethnicity, language, insurance, marital_status, gender, age at hospital admission)
 ```{r}
-mimic_icu_cohort %>%
-  ggplot(aes(x = factor(ethnicity), fill = thirty_day_mort)) +
-    geom_bar(position = "fill") +
-    scale_fill_manual(values = c("blue", "yellow")) +
-    labs(x = "Ethnicity", y = "Proportion", fill = "Thirty Day Mortality") +
-    theme(legend.position = "bottom") +
-    facet_wrap(~thirty_day_mort, scales = "free_y")
+prop.table(table(mimic_icu_cohort$gender, mimic_icu_cohort$thirty_day_mort))
+prop.table(table(mimic_icu_cohort$age_hadm, mimic_icu_cohort$thirty_day_mort))
+prop.table(table(mimic_icu_cohort$marital_status, mimic_icu_cohort$thirty_day_mort))
+prop.table(table(mimic_icu_cohort$insurance, mimic_icu_cohort$thirty_day_mort))
+prop.table(table(mimic_icu_cohort$language, mimic_icu_cohort$thirty_day_mort))
+prop.table(table(mimic_icu_cohort$ethnicity, mimic_icu_cohort$thirty_day_mort))
 ```
 
 - `thirty_day_mort` vs first lab measurements
+```{r}
+mimic_icu_cohort %>%
+  select(27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 43) %>%
+  gather(key = key, value = value, -thirty_day_mort) %>%
+  filter(!is.na(value)) %>%
+  filter(value > quantile(value, 0.025, na.rm = TRUE) 
+         & value < quantile(value, 0.975, na.rm = TRUE)) %>%
+  group_by(key, thirty_day_mort) %>%
+  summarize()
+
+```
 
 - `thirty_day_mort` vs first vital measurements
+```{r}
+mimic_icu_cohort %>%
+  select(37, 38, 39, 40, 41, 43) %>%
+  gather(key = key, value = value, -thirty_day_mort) %>%
+  filter(!is.na(value)) %>%
+  filter(value > quantile(value, 0.025, na.rm = TRUE) 
+         & value < quantile(value, 0.975, na.rm = TRUE)) %>%
+  group_by(key, thirty_day_mort) %>%
+  summarize()  
+```
 
 - `thirty_day_mort` vs first ICU unit
+```{r}
+prop.table(table(mimic_icu_cohort$first_careunit, mimic_icu_cohort$thirty_day_mort))
+```
