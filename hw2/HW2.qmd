@@ -658,3 +658,7 @@ mimic_icu_cohort %>%
 prop.table(table(mimic_icu_cohort$first_careunit, mimic_icu_cohort$thirty_day_mort))
 ```
 **Solution**: This is the graphic summary for thirty_day_mort and first ICU unit.
+
+```{bash}
+git merge develop
+```
