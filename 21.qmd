@@ -286,6 +286,7 @@ system(
 
 1. Find how many rows are in `labevents.csv.gz`.
 ```{r}
+#| eval: false
 system(
   str_c(
     "zcat < ", 
@@ -575,39 +576,85 @@ Summarize following information using appropriate numerics or graphs.
 
 - `thirty_day_mort` vs demographic variables (ethnicity, language, insurance, marital_status, gender, age at hospital admission)
 ```{r}
-prop.table(table(mimic_icu_cohort$gender, mimic_icu_cohort$thirty_day_mort))
-prop.table(table(mimic_icu_cohort$age_hadm, mimic_icu_cohort$thirty_day_mort))
-prop.table(table(mimic_icu_cohort$marital_status, mimic_icu_cohort$thirty_day_mort))
-prop.table(table(mimic_icu_cohort$insurance, mimic_icu_cohort$thirty_day_mort))
-prop.table(table(mimic_icu_cohort$language, mimic_icu_cohort$thirty_day_mort))
-prop.table(table(mimic_icu_cohort$ethnicity, mimic_icu_cohort$thirty_day_mort))
+summary_table <- prop.table(table(mimic_icu_cohort$ethnicity, mimic_icu_cohort$thirty_day_mort))
+summary_df <- as.data.frame(summary_table)
+colnames(summary_df) <- c("ethnicity", "thirty_day_mort", "prop")
+ggplot(summary_df, aes(x = ethnicity, y = prop, fill = thirty_day_mort)) +
+  geom_col() +
+  labs(x = "Ethnicity", y = "Proportion", fill = "30-day mortality", title = "Distribution of Ethnicity by 30-day Mortality") +
+  theme(legend.position = "bottom", axis.text.x = element_text(size = 8, angle = 45, hjust = 1))+
+  ggtitle("thirty_day_mort vs ethnicity")
 ```
+**Solution**: This is graphic summary for ethnicity and thirty_day_mort.
+
+```{r}
+prop.table(table(mimic_icu_cohort$language, mimic_icu_cohort$thirty_day_mort))
+```
+**Solution**: This is numeric summary for language and thirty_day_mort.
+
+```{r}
+prop.table(table(mimic_icu_cohort$insurance, mimic_icu_cohort$thirty_day_mort))
+```
+**Solution**: This is numeric summary for insurance and thirty_day_mort.
+
+```{r}
+prop.table(table(mimic_icu_cohort$marital_status, mimic_icu_cohort$thirty_day_mort))
+```
+**Solution**: This is numeric summary for marital_status and thirty_day_mort.
+
+```{r}
+prop.table(table(mimic_icu_cohort$gender, mimic_icu_cohort$thirty_day_mort))
+```
+**Solution**: this is numeric summary for gender and thirty_day_mort
+
+```{r}
+summary_table <- table(mimic_icu_cohort$age_at_admission, mimic_icu_cohort$thirty_day_mort)
+summary_df <- as.data.frame(summary_table)
+colnames(summary_df) <- c("age_at_admission", "thirty_day_mort", "count")
+ggplot(summary_df, aes(x = age_at_admission, y = count, fill = thirty_day_mort)) +
+  geom_col() +
+  scale_x_discrete(breaks = seq(20, 100, by = 10)) +
+  labs(x = "Age at admission", y = "Count", fill = "30-day mortality") +
+  theme(legend.position = "bottom") +
+  ggtitle("thirty_day_mort vs age_at_admission")
+```
+**Solution**: this is graph summary for age_at_admission and thirty_dat_mort
+
 
 - `thirty_day_mort` vs first lab measurements
 ```{r}
 mimic_icu_cohort %>%
-  select(27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 43) %>%
-  gather(key = key, value = value, -thirty_day_mort) %>%
-  filter(!is.na(value)) %>%
+  gather(27:36, key = "key", value = "value") %>%
+  group_by(key) %>%
   filter(value > quantile(value, 0.025, na.rm = TRUE) 
          & value < quantile(value, 0.975, na.rm = TRUE)) %>%
-  group_by(key, thirty_day_mort) %>%
-  summarize()
+  ungroup %>%
+  ggplot(mapping = aes(x = thirty_day_mort, y = value)) +
+  geom_boxplot() +
+  labs(x = "30 day mortality") +
+  facet_wrap(~key, scales = "free_y") +
+  labs(title = "thirty_day_mort vs first lab measurements")
 ```
+**Solution**: This is the graphic summary for thirty_day_mort and first lab measurements
 
 - `thirty_day_mort` vs first vital measurements
 ```{r}
 mimic_icu_cohort %>%
-  select(37, 38, 39, 40, 41, 43) %>%
-  gather(key = key, value = value, -thirty_day_mort) %>%
-  filter(!is.na(value)) %>%
+  gather(35:39, key = "key", value = "value") %>%
+  group_by(key) %>%
   filter(value > quantile(value, 0.025, na.rm = TRUE) 
          & value < quantile(value, 0.975, na.rm = TRUE)) %>%
-  group_by(key, thirty_day_mort) %>%
-  summarize()  
+  ungroup() %>%
+  ggplot(mapping = aes(x = value)) +
+  geom_histogram(binwidth = 5) +
+  labs(x = "Value", y = "Frequency") +
+  facet_wrap(~key, scales = "free_y") +
+  labs(title = "thirty_day_mort vs first vital measurements")
 ```
+**Solution**: This is the graphic summary for thirty_day_mort and first vital measurements.
 
 - `thirty_day_mort` vs first ICU unit
 ```{r}
 prop.table(table(mimic_icu_cohort$first_careunit, mimic_icu_cohort$thirty_day_mort))
 ```
+**Solution**: This is the graphic summary for thirty_day_mort and first ICU unit.
