@@ -555,21 +555,19 @@ Let us create a tibble `mimic_icu_cohort` for all ICU stays, where rows are the 
 mimic_icu_cohort <- icustays_tble %>%
     left_join(admissions_tble, by = c("subject_id", "hadm_id")) %>%
     left_join(patients_tble, by = c("subject_id")) %>%
-    left_join(labevents_tble, by = c("subject_id")) %>%
-    left_join(chartevents_tble, by = c("subject_id")) %>%
+    left_join(labevents_tble1, by = c("subject_id")) %>%
+    left_join(chartevents_tble1, by = c("subject_id")) %>%
     mutate(age_at_admission = anchor_age + year(admittime) - anchor_year) %>%
     filter(age_at_admission > 18) %>%
     mutate(thirty_day_mort = 
          ifelse(is.na(deathtime), "FALSE", 
                 ifelse(difftime(deathtime, admittime, units = "days") <= 30, 
                        "TRUE", "FALSE"))) %>%
-    print(width = 10)
+  select(-hadm_id.y)%>%
+    print(width = Inf)
 ```
-**Solution**: Vector memory exhausted, So I can only write the code, but cant run the result.hi
+**Solution**: during the process, I found there are two variables, they are hadm_id.x and hadm_id.y, they have the same value, so I decide delete hadm_id.y.
 
-```{r}
-ls()
-```
 
 ## Q8. Exploratory data analysis (EDA)
 
