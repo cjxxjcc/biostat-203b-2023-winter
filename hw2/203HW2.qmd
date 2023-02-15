@@ -286,7 +286,6 @@ system(
 
 1. Find how many rows are in `labevents.csv.gz`.
 ```{r}
-#| eval: false
 system(
   str_c(
     "zcat < ", 
