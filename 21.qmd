@@ -567,7 +567,7 @@ mimic_icu_cohort <- icustays_tble %>%
   select(-hadm_id.y)%>%
     print(width = Inf)
 ```
-**Solution**: during the process, I found there are two variables, they are hadm_id.x and hadm_id.y, they have the same value, so I decide delete hadm_id.y.
+**Solution**: During the process, I found there are two variables, they are hadm_id.x and hadm_id.y, they have the same value, so I decide delete hadm_id.y.
 
 
 ## Q8. Exploratory data analysis (EDA)
