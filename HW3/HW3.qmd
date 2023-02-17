@@ -25,6 +25,8 @@ Display machine information:
 sessionInfo()
 ```
 
+
+
 Load database libraries and the tidyverse frontend:
 ```{r}
 library(bigrquery)
