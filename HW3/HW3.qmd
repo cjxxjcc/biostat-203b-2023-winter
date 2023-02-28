@@ -118,16 +118,59 @@ patients_tble <- tbl(con, "patients") %>%
 
 6. Connect to the `labevents` table and retrieve a subset that only contain subjects who appear in `icustays_tble` and the lab items listed in HW2. 
 ```{r}
-# # TODO
 labevents_tble <- tbl(con, "labevents") %>%
+  show_query() %>%
+  print(width = Inf)
+```
+
+```{r}
+dlabitems_tble <- tbl(con, "d_labitems") %>%
+  show_query() %>%
+  print(width = Inf)
+```
+
+```{r}
+labevents_tble <- labevents_tble %>%
+  select(subject_id, itemid, charttime, valuenum) %>%
+  filter(itemid %in% c(
+    50912,
+    50971,
+    50983,
+    50902,
+    50882,
+    51221,
+    51301,
+    50931
+    )) %>%
+  semi_join(icustays_tble, by = c("subject_id")) %>%
   show_query() %>%
   print(width = Inf)
 ```
 Only keep the first lab measurements during ICU stay and pivot lab items to become variables/columns.
 ```{r}
-# # TODO
-# labevents_tble <- labevents_tble %>% ...
+labevents_tble <- labevents_tble %>%
+  left_join(select(icustays_tble, subject_id, intime, outtime),
+            by = c("subject_id")) %>%
+  filter(charttime >= intime, charttime <= outtime) %>%
+  show_query() %>%
+  print(width = Inf)
 ```
+
+```{r}
+labevents_tble <- labevents_tble %>%
+  select(subject_id, itemid, charttime) %>%
+  group_by(subject_id, itemid) %>%
+  summarise_all(min) %>%
+  left_join(labevents_tble, by = c("subject_id", "itemid", "charttime")) %>%
+  select(-charttime, -intime, -outtime) %>%
+  pivot_wider(names_from = itemid, 
+              values_from = valuenum,
+              names_prefix = "L") %>%
+  show_query() %>%
+  print(width = Inf)
+```
+
+**Solution**: Names_prefix help fix an error " invalid field name "51221". Fields must contain only letters, numbers, and underscores, start with a letter or underscore, and be at most 300 characters long. [invalid]"
 
 7. Connect to `chartevents` table and retrieve a subset that only contain subjects who appear in `icustays_tble` and the chart events listed in HW2.
 ```{r}
