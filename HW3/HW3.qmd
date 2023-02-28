@@ -100,7 +100,6 @@ icustays_tble <- icustays_tble %>%
 
 4. Connect to the `admissions` table and only keep the patients who have a match in `icustays_tble` (according to `subject_id` and `hadm_id`).
 ```{r}
-# # TODO
 admissions_tble <- tbl(con, "admissions") %>%
   semi_join(icustays_tble, by = c("subject_id", "hadm_id")) %>%
   show_query() %>%
@@ -109,7 +108,6 @@ admissions_tble <- tbl(con, "admissions") %>%
 
 5. Connect to the `patients` table and only keep the patients who have a match in `icustays_tble` (according to `subject_id`).
 ```{r}
-# # TODO
 patients_tble <- tbl(con, "patients") %>%
   semi_join(icustays_tble, by = c("subject_id")) %>%
   show_query() %>%
@@ -161,7 +159,9 @@ labevents_tble <- labevents_tble %>%
   select(subject_id, itemid, charttime) %>%
   group_by(subject_id, itemid) %>%
   summarise_all(min) %>%
-  left_join(labevents_tble, by = c("subject_id", "itemid", "charttime")) %>%
+  left_join(labevents_tble, by = c("subject_id", 
+                                   "itemid", 
+                                   "charttime")) %>%
   select(-charttime, -intime, -outtime) %>%
   pivot_wider(names_from = itemid, 
               values_from = valuenum,
@@ -174,14 +174,58 @@ labevents_tble <- labevents_tble %>%
 
 7. Connect to `chartevents` table and retrieve a subset that only contain subjects who appear in `icustays_tble` and the chart events listed in HW2.
 ```{r}
-# # TODO
-# chartevents_tble <- 
+chartevents_tble <- tbl(con, "chartevents") %>%
+  show_query() %>%
+  print(width = Inf)
+```
+
+```{r}
+ditems_tble <- tbl(con, "d_items") %>%
+  show_query() %>%
+  print(width = Inf)
+```
+
+```{r}
+chartevents_tble <- chartevents_tble %>%
+  select(subject_id, itemid, charttime, valuenum) %>%
+  filter(itemid %in% c(
+    220045,
+    220181,
+    220179,
+    223761,
+    220210
+    )) %>%
+  semi_join(icustays_tble, by = c("subject_id")) %>%
+  show_query() %>%
+  print(width = Inf)
 ```
 Only keep the first chart events during ICU stay and pivot chart events to become variables/columns.
 ```{r}
-# # TODO
-# chartevents_tble <- chartevents_tble %>% ...
+chartevents_tble <- chartevents_tble %>%
+  left_join(select(icustays_tble, subject_id, intime, outtime), 
+            by = c("subject_id")) %>%
+  filter(charttime >= intime, charttime <= outtime) %>%
+  show_query() %>%
+  print(width = Inf)
 ```
+
+```{r}
+chartevents_tble <- chartevents_tble %>%
+  select(subject_id, itemid, charttime) %>%
+  group_by(subject_id, itemid) %>%
+  summarise_all(min) %>%
+  left_join(chartevents_tble, by = c("subject_id",
+                                     "itemid",
+                                     "charttime")) %>%
+  select(-charttime, -intime, -outtime) %>%
+  pivot_wider(names_from = itemid, 
+              values_from = valuenum, 
+              names_prefix = "C") %>%
+  show_query() %>%
+  print(width = Inf)
+```
+
+**Solution**: Same idea as Q6.
 
 8. Put things together. This step is similar to Q7 of HW2. Using one chain of pipes `%>%` to perform following data wrangling steps: (i) start with the `icustays_tble` for the first ICU stay of each unique patient, (ii) merge in admissions and patients tables, (iii) keep adults only (age at admission >= 18), (iv) merge in the labevents and chartevents tables, (v) create an indicator for 30-day mortality, (vi) save the final tibble to an `icu_cohort.rds` R data file in the `mimiciv_shiny` folder.
 
