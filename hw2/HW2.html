@@ -167,11 +167,12 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] digest_0.6.31   lifecycle_1.0.3 jsonlite_1.8.4  magrittr_2.0.3 
- [5] evaluate_0.20   rlang_1.0.6     stringi_1.7.12  cli_3.6.0      
- [9] rstudioapi_0.14 vctrs_0.5.2     rmarkdown_2.20  tools_4.2.2    
-[13] stringr_1.5.0   glue_1.6.2      xfun_0.36       yaml_2.3.6     
-[17] fastmap_1.1.0   compiler_4.2.2  htmltools_0.5.4 knitr_1.41     </code></pre>
+ [1] digest_0.6.31     lifecycle_1.0.3   jsonlite_1.8.4    magrittr_2.0.3   
+ [5] evaluate_0.20     rlang_1.0.6       stringi_1.7.12    cli_3.6.0        
+ [9] rstudioapi_0.14   vctrs_0.5.2       rmarkdown_2.20    tools_4.2.2      
+[13] stringr_1.5.0     glue_1.6.2        htmlwidgets_1.6.1 xfun_0.36        
+[17] yaml_2.3.6        fastmap_1.1.0     compiler_4.2.2    htmltools_0.5.4  
+[21] knitr_1.41       </code></pre>
 </div>
 </div>
 <p>Load necessary libraries (you can add more as needed).</p>
@@ -192,14 +193,15 @@ loaded via a namespace (and not attached):
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system</span>(<span class="fu">str_c</span>(<span class="st">"ls -l "</span>, mimic_path, <span class="st">"/"</span>), <span class="at">intern =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "total 24"                                                                     
-[2] "-rw-rw-r--@  1 chengjiaxin  staff  2518 Mar 10  2021 LICENSE.txt"             
-[3] "drwxr-xr-x@  5 chengjiaxin  staff   160 Jan 23 22:10 MIMIC-reduce-chartevents"
-[4] "-rw-rw-r--@  1 chengjiaxin  staff  2459 Mar 16  2021 SHA256SUMS.txt"          
-[5] "drwxr-xr-x@  6 chengjiaxin  staff   192 Jan 23 22:10 core"                    
-[6] "drwxr-xr-x@ 21 chengjiaxin  staff   672 Jan 23 22:10 hosp"                    
-[7] "drwxr-xr-x@ 11 chengjiaxin  staff   352 Jan 23 22:10 icu"                     
-[8] "-rw-rw-r--@  1 chengjiaxin  staff   797 Jan  4  2022 index.html"              </code></pre>
+<pre><code>[1] "total 32"                                                                                      
+[2] "-rw-rw-r--@  1 chengjiaxin  staff  2518 Mar 10  2021 LICENSE.txt"                              
+[3] "drwxr-xr-x@  5 chengjiaxin  staff   160 Jan 23 22:10 MIMIC-reduce-chartevents"                 
+[4] "-rw-rw-r--@  1 chengjiaxin  staff  2459 Mar 16  2021 SHA256SUMS.txt"                           
+[5] "-rw-r--r--@  1 chengjiaxin  staff  2356 Feb 16 16:16 biostat-203b-2023winter-3fdc2392ac39.json"
+[6] "drwxr-xr-x@  6 chengjiaxin  staff   192 Jan 23 22:10 core"                                     
+[7] "drwxr-xr-x@ 21 chengjiaxin  staff   672 Jan 23 22:10 hosp"                                     
+[8] "drwxr-xr-x@ 11 chengjiaxin  staff   352 Jan 23 22:10 icu"                                      
+[9] "-rw-rw-r--@  1 chengjiaxin  staff   797 Jan  4  2022 index.html"                               </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system</span>(<span class="fu">str_c</span>(<span class="st">"ls -l "</span>, mimic_path, <span class="st">"/core"</span>), <span class="at">intern =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -255,21 +257,21 @@ loaded via a namespace (and not attached):
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">read.csv</span>(<span class="fu">str_c</span>(mimic_path,<span class="st">"/core/admissions.csv.gz"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  5.427   0.111   5.547 </code></pre>
+  5.323   0.087   5.411 </code></pre>
 </div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">read_csv</span>(<span class="fu">str_c</span>(mimic_path, <span class="st">"/core/admissions.csv.gz"</span>),<span class="at">show_col_types =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  1.700   1.009   0.775 </code></pre>
+  1.807   1.213   0.863 </code></pre>
 </div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">fread</span>(<span class="fu">str_c</span>(mimic_path,<span class="st">"/core/admissions.csv.gz"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.434   0.143   0.579 </code></pre>
+  0.433   0.128   0.564 </code></pre>
 </div>
 </div>
 <p><strong>solution</strong>:Compare 3 results, we could fina that fread is the most fast function.read.csv in base R will typically parse all variables as characters by default, while read_csv in the tidyverse and fread in data.table will attempt to automatically detect and parse the correct data types based on the contents of the file.</p>
@@ -883,7 +885,7 @@ loaded via a namespace (and not attached):
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
- 26.375  19.349  10.593 </code></pre>
+ 30.980  21.885  12.103 </code></pre>
 </div>
 </div>
 <p><strong>Solution</strong>: Dr.Zhou provide the solution of this question.</p>
@@ -1153,7 +1155,7 @@ loaded via a namespace (and not attached):
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
- 24.542  19.629   9.754 </code></pre>
+ 25.137  18.132  10.534 </code></pre>
 </div>
 </div>
 <p><strong>Solution</strong>: I answer this base on the solution of Q5 that provide by Dr.Zhou</p>
