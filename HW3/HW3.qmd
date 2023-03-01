@@ -317,10 +317,10 @@ ui <- pageWithSidebar(
 ```{r}
 server <- function(input, output) {
   output$plot <- renderPlot({
-    if (input$variable == "Age at Admission") {
+    if (input$variable == "Age at Adimission") {
       ggplot(icu_cohort, aes(x = age_at_admission)) +
-        geom_density() +
-        labs(x = "Age at Admission", y = "Density")
+        geom_histogram(binwidth = 5) +
+        labs(x = "Age at Hospital Admission", y = "Frequency")
     } else if (input$variable == "Gender") {
       ggplot(icu_cohort, aes(x = gender)) +
         geom_bar() +
