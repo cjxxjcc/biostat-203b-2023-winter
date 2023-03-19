@@ -248,27 +248,46 @@ gb_fit
 ```
 
 ```{r}
-
+gb_fit %>%
+  collect_metrics() %>%
+  print(width = Inf) %>%
+  filter(.metric == "roc_auc") %>%
+  ggplot(mapping = aes(x = learn_rate, y = mean, color = tree_depth)) +
+  geom_point() +
+  labs(x = "Learning Rate", y = "CV AUC") +
+  scale_x_log10()
 ```
 
 ```{r}
-
+gb_fit %>%
+  show_best("roc_auc")
 ```
 
 ```{r}
-
+best_gb <- gb_fit %>%
+  select_best("roc_auc")
+best_gb
 ```
 
 ```{r}
-
+# Final workflow
+final_wf <- gb_wf %>%
+  finalize_workflow(best_gb)
+final_wf
 ```
 
 ```{r}
-
+# Fit the whole training set, then predict the test cases
+final_fit <- 
+  final_wf %>%
+  last_fit(data_split)
+final_fit
 ```
 
 ```{r}
-
+# Test metrics
+final_fit %>% 
+  collect_metrics()
 ```
 
 ```{r}
