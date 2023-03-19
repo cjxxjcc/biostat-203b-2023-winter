@@ -47,7 +47,6 @@ library(GGally)
 library(gtsummary)
 library(tidyverse)
 library(tidymodels)
-library()
 
 icu_cohort <- read_rds("/Users/chengjiaxin/Desktop/Biostat203b/HW/HW3/mimiciv_shiny/icu_cohort.rds")
 ```
@@ -188,6 +187,7 @@ final_fit
 final_fit %>% 
   collect_metrics()
 ```
+**Solution**: RF Accuracy is 0.9223649
 
 (2).Boosting Approach
 ```{r}
@@ -289,45 +289,107 @@ final_fit
 final_fit %>% 
   collect_metrics()
 ```
+**Solution**: Boosting accuracy is 0.9227192.
 
+(3). Support Vector Machines
 ```{r}
-
+svm_recipe <- 
+  recipe(
+    thirty_day_mort ~ ., 
+    data = icu_cohort_other
+  ) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_numeric_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) %>%
+  prep(training = icu_cohort_other, retain = TRUE)
+svm_recipe
 ```
 
 ```{r}
-
+svm_mod <- 
+  svm_rbf(
+    mode = "classification",
+    cost = tune(),
+    rbf_sigma = tune()
+  ) %>% 
+  set_engine("kernlab")
+svm_mod
 ```
 
 ```{r}
-
+svm_wf <- workflow() %>%
+  add_recipe(svm_recipe) %>%
+  add_model(svm_mod)
+svm_wf
 ```
 
 ```{r}
-
+param_grid <- grid_regular(
+  cost(range = c(-8, 5)),
+  rbf_sigma(range = c(-5, -3)),
+  levels = c(14, 5)
+  )
+param_grid
 ```
 
 ```{r}
+set.seed(203)
 
+folds <- vfold_cv(icu_cohort_other, v = 5)
+folds
 ```
 
 ```{r}
-
+svm_fit <- svm_wf %>%
+  tune_grid(
+    resamples = folds,
+    grid = param_grid,
+    metrics = metric_set(roc_auc, accuracy)
+    )
+svm_fit
 ```
 
 ```{r}
-
+svm_fit %>%
+  collect_metrics() %>%
+  print(width = Inf) %>%
+  filter(.metric == "roc_auc") %>%
+  ggplot(mapping = aes(x = cost, y = mean, alpha = rbf_sigma)) +
+  geom_point() +
+  labs(x = "Cost", y = "CV AUC") +
+  scale_x_log10()
 ```
 
 ```{r}
-
+svm_fit %>%
+  show_best("roc_auc")
 ```
 
 ```{r}
-
+best_svm <- svm_fit %>%
+  select_best("roc_auc")
+best_svm
 ```
 
 ```{r}
-
+# Final workflow
+final_wf <- svm_wf %>%
+  finalize_workflow(best_svm)
+final_wf
 ```
 
+```{r}
+# Fit the whole training set, then predict the test cases
+final_fit <- 
+  final_wf %>%
+  last_fit(data_split)
+final_fit
+```
+
+```{r}
+# Test metrics
+final_fit %>% 
+  collect_metrics()
+```
+**Solution**: Support Vector Machines accuracy is 0.9218778
 3. Compare model classification performance on the test set. Report both the area under ROC curve and accuracy for each model.
