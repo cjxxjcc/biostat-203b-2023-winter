@@ -270,14 +270,12 @@ best_gb
 ```
 
 ```{r}
-# Final workflow
 final_wf <- gb_wf %>%
   finalize_workflow(best_gb)
 final_wf
 ```
 
 ```{r}
-# Fit the whole training set, then predict the test cases
 final_fit <- 
   final_wf %>%
   last_fit(data_split)
@@ -392,4 +390,6 @@ final_fit %>%
   collect_metrics()
 ```
 **Solution**: Support Vector Machines accuracy is 0.9218778
+
 3. Compare model classification performance on the test set. Report both the area under ROC curve and accuracy for each model.
+**Solution**: We could conclude that the boosting analytic approach have the highest accuracy, and Support Vector Machines approach have the lowest accuracy.
