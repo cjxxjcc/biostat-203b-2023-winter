@@ -94,7 +94,6 @@ dim(icu_cohort_test)
 
 (1). Random Forest Approach
 ```{r}
-#| eval: false
 rf_recipe <- 
   recipe(
     thirty_day_mort ~ ., 
@@ -106,7 +105,6 @@ rf_recipe
 ```
 
 ```{r}
-#| eval: false
 rf_mod <- 
   rand_forest(
     mode = "classification",
@@ -118,7 +116,6 @@ rf_mod
 ```
 
 ```{r}
-#| eval: false
 rf_wf <- workflow() %>%
   add_recipe(rf_recipe) %>%
   add_model(rf_mod)
@@ -126,7 +123,6 @@ rf_wf
 ```
 
 ```{r}
-#| eval: false
 param_grid <- grid_regular(
   trees(range = c(100L, 500L)), 
   mtry(range = c(2L, 8L)),
@@ -136,7 +132,6 @@ param_grid
 ```
 
 ```{r}
-#| eval: false
 set.seed(203)
 
 folds <- vfold_cv(icu_cohort_other, v = 5)
@@ -144,7 +139,6 @@ folds
 ```
 
 ```{r}
-#| eval: false
 rf_fit <- rf_wf %>%
   tune_grid(
     resamples = folds,
@@ -155,7 +149,6 @@ rf_fit
 ```
 
 ```{r}
-#| eval: false
 rf_fit %>%
   collect_metrics() %>%
   print(width = Inf) %>%
@@ -167,27 +160,23 @@ rf_fit %>%
 ```
 
 ```{r}
-#| eval: false
 rf_fit %>%
   show_best("roc_auc")
 ```
 
 ```{r}
-#| eval: false
 best_rf <- rf_fit %>%
   select_best("roc_auc")
 best_rf
 ```
 
 ```{r}
-#| eval: false
 final_wf <- rf_wf %>%
   finalize_workflow(best_rf)
 final_wf
 ```
 
 ```{r}
-#| eval: false
 final_fit <- 
   final_wf %>%
   last_fit(data_split)
@@ -195,7 +184,6 @@ final_fit
 ```
 
 ```{r}
-#| eval: false
 final_fit %>% 
   collect_metrics()
 ```
@@ -203,7 +191,6 @@ final_fit %>%
 
 (2).Boosting Approach
 ```{r}
-#| eval: false
 gb_recipe <- 
   recipe(
     thirty_day_mort ~ ., 
@@ -216,7 +203,6 @@ gb_recipe
 ```
 
 ```{r}
-#| eval: false
 gb_mod <- 
   boost_tree(
     mode = "classification",
@@ -229,7 +215,6 @@ gb_mod
 ```
 
 ```{r}
-#| eval: false
 gb_wf <- workflow() %>%
   add_recipe(gb_recipe) %>%
   add_model(gb_mod)
@@ -237,7 +222,6 @@ gb_wf
 ```
 
 ```{r}
-#| eval: false
 param_grid <- grid_regular(
   tree_depth(range = c(1L, 3L)),
   learn_rate(range = c(-5, 2), trans = log10_trans()),
@@ -247,7 +231,6 @@ param_grid
 ```
 
 ```{r}
-#| eval: false
 set.seed(203)
 
 folds <- vfold_cv(icu_cohort_other, v = 5)
@@ -255,7 +238,6 @@ folds
 ```
 
 ```{r}
-#| eval: false
 gb_fit <- gb_wf %>%
   tune_grid(
     resamples = folds,
@@ -266,7 +248,6 @@ gb_fit
 ```
 
 ```{r}
-#| eval: false
 gb_fit %>%
   collect_metrics() %>%
   print(width = Inf) %>%
@@ -278,27 +259,23 @@ gb_fit %>%
 ```
 
 ```{r}
-#| eval: false
 gb_fit %>%
   show_best("roc_auc")
 ```
 
 ```{r}
-#| eval: false
 best_gb <- gb_fit %>%
   select_best("roc_auc")
 best_gb
 ```
 
 ```{r}
-#| eval: false
 final_wf <- gb_wf %>%
   finalize_workflow(best_gb)
 final_wf
 ```
 
 ```{r}
-#| eval: false
 final_fit <- 
   final_wf %>%
   last_fit(data_split)
@@ -306,7 +283,6 @@ final_fit
 ```
 
 ```{r}
-#| eval: false
 final_fit %>% 
   collect_metrics()
 ```
@@ -314,7 +290,6 @@ final_fit %>%
 
 (3). Support Vector Machines
 ```{r}
-#| eval: false
 svm_recipe <- 
   recipe(
     thirty_day_mort ~ ., 
@@ -328,7 +303,6 @@ svm_recipe
 ```
 
 ```{r}
-#| eval: false
 svm_mod <- 
   svm_rbf(
     mode = "classification",
@@ -340,7 +314,6 @@ svm_mod
 ```
 
 ```{r}
-#| eval: false
 svm_wf <- workflow() %>%
   add_recipe(svm_recipe) %>%
   add_model(svm_mod)
@@ -348,7 +321,6 @@ svm_wf
 ```
 
 ```{r}
-#| eval: false
 param_grid <- grid_regular(
   cost(range = c(-8, 5)),
   rbf_sigma(range = c(-5, -3)),
@@ -358,7 +330,6 @@ param_grid
 ```
 
 ```{r}
-#| eval: false
 set.seed(203)
 
 folds <- vfold_cv(icu_cohort_other, v = 5)
@@ -366,7 +337,6 @@ folds
 ```
 
 ```{r}
-#| eval: false
 svm_fit <- svm_wf %>%
   tune_grid(
     resamples = folds,
@@ -377,7 +347,6 @@ svm_fit
 ```
 
 ```{r}
-#| eval: false
 svm_fit %>%
   collect_metrics() %>%
   print(width = Inf) %>%
@@ -389,27 +358,23 @@ svm_fit %>%
 ```
 
 ```{r}
-#| eval: false
 svm_fit %>%
   show_best("roc_auc")
 ```
 
 ```{r}
-#| eval: false
 best_svm <- svm_fit %>%
   select_best("roc_auc")
 best_svm
 ```
 
 ```{r}
-#| eval: false
 final_wf <- svm_wf %>%
   finalize_workflow(best_svm)
 final_wf
 ```
 
 ```{r}
-#| eval: false
 final_fit <- 
   final_wf %>%
   last_fit(data_split)
@@ -417,12 +382,11 @@ final_fit
 ```
 
 ```{r}
-#| eval: false
 final_fit %>% 
   collect_metrics()
 ```
-**Solution**: Support Vector Machines accuracy is 0.9218778
+**Solution**: Support Vector Machines approach accuracy is 0.9218778
 
 3. Compare model classification performance on the test set. Report both the area under ROC curve and accuracy for each model.
 
-**Solution**: We could conclude that the boosting analytic approach have the highest accuracy, and Support Vector Machines approach have the lowest accuracy.
+**Solution**: 3 analytic approaches are: Random Forest, Boosting, and Support Vector Machines. Single ROC curve for each approach shown above. We could conclude that the boosting analytic approach have the highest accuracy, and Support Vector Machines approach have the lowest accuracy. Boosting approach have the best performance.
