@@ -53,7 +53,8 @@ icu_cohort <- read_rds("HW4/icu_cohort.rds")
 **solution**: Load data.
 
 ```{r}
-selected_vars = c("gender", "age_at_admission", "marital_status", "ethnicity",
+selected_vars = c("gender", "age_at_admission", "marital_status",
+              "ethnicity",
               "thirty_day_mort",
               "L50912",
               "L50971", 
