@@ -48,7 +48,7 @@ library(gtsummary)
 library(tidyverse)
 library(tidymodels)
 
-icu_cohort <- read_rds("/Users/chengjiaxin/Desktop/Biostat203b/HW/HW3/mimiciv_shiny/icu_cohort.rds")
+icu_cohort <- read_rds("HW4/icu_cohort.rds")
 ```
 **solution**: Load data.
 
@@ -390,3 +390,4 @@ final_fit %>%
 3. Compare model classification performance on the test set. Report both the area under ROC curve and accuracy for each model.
 
 **Solution**: 3 analytic approaches are: Random Forest, Boosting, and Support Vector Machines. Single ROC curve for each approach shown above. We could conclude that the boosting analytic approach have the highest accuracy, and Support Vector Machines approach have the lowest accuracy. Boosting approach have the best performance.
+
