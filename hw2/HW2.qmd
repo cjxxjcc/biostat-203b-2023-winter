@@ -657,4 +657,4 @@ mimic_icu_cohort %>%
 ```{r}
 prop.table(table(mimic_icu_cohort$first_careunit, mimic_icu_cohort$thirty_day_mort))
 ```
-**Solution**: This is the graphic summary for thirty_day_mort and first ICU unit.
+**Solution**: This is the graphic summary for thirty_day_mort and first ICU unit. Hello World.
